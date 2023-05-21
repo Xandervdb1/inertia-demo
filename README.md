@@ -1,4 +1,6 @@
 # Laravel - React stack using Inertia.js
+## Table of Contents
+[Installation](#installation)
 ## Installation
 1. Create a Laravel project
 ```
@@ -342,7 +344,6 @@ Inertia will overwrite the title tag to the one specified inside your specific p
 
 ```js
 // Layout.js
-
 import { Head } from '@inertiajs/react'
 
 <Head>
@@ -352,11 +353,19 @@ import { Head } from '@inertiajs/react'
 </Head>
 
 // About.js
-
 import { Head } from '@inertiajs/react'
 
 <Head>
   <title>About - My app</title>
   <meta head-key="description" name="description" content="This is a page specific description" />
 </Head>
+```
+
+Result
+```html
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>About - My app</title>
+  <meta name="description" content="This is a page specific description" />
+</head>
 ```
