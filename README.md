@@ -113,6 +113,41 @@ export default function Welcome() {
     );
 }
 ```
+## Layout files
+Inertia uses normal React components to define a layout, giving the option to append anything between the component tags at a certain place within the layout
+
+In the layout.jsx file
+```js
+const Layout = ({children}) => {
+    return (
+        <>
+            <div>This is a layout component used on every single page</div>
+            <div>We can choose to show the tags nested inside the Layout component tags at any place</div>
+            <div>Here for example:</div>
+            {children}
+            <div>This is the end of the layout component</div>
+        </>
+    )
+}
+export default Layout;
+```
+On the page:
+```js
+export default function Welcome() {
+    return (
+        <>
+            <div className="border-red-500 border-4">
+                <Layout>
+                    <Nav />
+                    <p>Extra content</p>
+                </Layout>
+            </div>
+            <h1 className="font-bold text-3xl">Hello World - Welcome page</h1>
+        </>
+    );
+}
+```
+The Nav component, as well as the extra content inside the paragraph tag will both be placed on where `{children}` is used in the Layout file
 
 ## Progress bar on loading pages
 By default, there is a loading bar at the top of the page whenever the user loads a different page (to simulate this, there's a `sleep(2)` in the welcome route)
