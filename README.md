@@ -113,7 +113,8 @@ export default function Welcome() {
     );
 }
 ```
-## Layout files
+## Layouts
+### Layout files
 Inertia uses normal React components to define a layout, giving the option to append anything between the component tags at a certain place within the layout
 
 In the layout.jsx file
@@ -148,6 +149,56 @@ export default function Welcome() {
 }
 ```
 The Nav component, as well as the extra content inside the paragraph tag will both be placed on where `{children}` is used in the Layout file
+### Persistent layouts
+Because of the Layout component being a child of the Page component, it gets destroyed and rebuilt every time the user moves onto a different page. If we want to prevent this (for several reasons, maybe the layout contains a video/audio file that shouldn't be restarting every time the page changes), we can use persistent layouts
+
+To use a persistent layout, we have to change the way it gets renderd inside the page file
+```js
+import Layout from './Layout'
+
+const Home = ({ user }) => {
+  return (
+    <>
+      <H1>Welcome</H1>
+      <p>Hello {user.name}, welcome to your first Inertia app!</p>
+    </>
+  )
+}
+
+Home.layout = page => <Layout children={page} title="Welcome" />
+
+export default Home
+```
+### Default layouts
+We can define a default layout to be set for all pages, if we don't want to import it on every single page. This is done in `resource/js/app.jsx`, inside the `resolve` property of the `createInertiaApp`
+```js
+import Layout from './Layout'
+
+createInertiaApp({
+  resolve: name => {
+    const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
+    let page = pages[`./Pages/${name}.jsx`]
+    page.default.layout = page.default.layout || (page => <Layout children={page} />)
+    return page
+  },
+  // ...
+})
+```
+
+It is also possible to set a layout based on the page file's name
+```js
+import Layout from './Layout'
+
+createInertiaApp({
+  resolve: name => {
+    const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
+    let page = pages[`./Pages/${name}.jsx`]
+    page.default.layout = name.startsWith('Public/') ? undefined : page => <Layout children={page} />
+    return page
+  },
+  // ...
+})
+```
 
 ## Progress bar on loading pages
 By default, there is a loading bar at the top of the page whenever the user loads a different page (to simulate this, there's a `sleep(2)` in the welcome route)
@@ -225,4 +276,87 @@ const { url, component } = usePage()
 
 //inside the render
 <Link href="/users" className={component.startsWith('Users') ? 'active' : ''}>Users</Link>
+```
+
+## Shared data across all pages and components
+If we want data to be accessible on every page/component (for example, the data for a logged in user), we can use the share function inside the Inertia middleware, located in `app/Http/Middleware/HandleInertiaRequest`
+
+```js
+public function share(Request $request): array
+    {
+        return array_merge(parent::share($request), [
+            'auth' => [
+                'user' => $request->user(),
+            ],
+            'foo' => 'bar',
+        ]);
+    }
+```
+
+To access the shared data, we use the `usePage()` method from Inertia again
+
+```js
+import { usePage } from '@inertiajs/react'
+
+export default function Layout({ children }) {
+  const { auth } = usePage().props
+  const { foo } = usePage().props
+
+  return (
+    <main>
+      <header>
+        You are logged in as: {auth.user.name}
+      </header>
+      <content>
+        {children}
+      </content>
+    </main>
+  )
+}
+```
+
+Make sure you don't pass through any sensitive information in the shared data, as this data gets shared with the client-side
+
+## Head & Title
+If we want to change the meta tags or titles of our pages, we have to use the `<Head>` component, which Inertia offers us
+
+```js
+import { Head } from '@inertiajs/react'
+
+<Head>
+  <title>Your page title</title>
+  <meta name="description" content="Your page description" />
+</Head>
+```
+Note: changing the title will still add *"- Laravel"* behind it. This is the app name, defined in the `.env` file, which you should change to your own
+
+If you only need to add a title, you can use the shorthand
+```js
+import { Head } from '@inertiajs/react'
+
+<Head title="Your page title" />
+```
+
+### What if we have multiple Head instances?
+Inertia will overwrite the title tag to the one specified inside your specific page component. For meta-tags, we'll need to tell it which ones are the same and should be overwritten by the ones specified inside the page component, by passing along the `head-key` 
+
+```js
+// Layout.js
+
+import { Head } from '@inertiajs/react'
+
+<Head>
+  <title>My app</title>
+  <meta head-key="description" name="description" content="This is the default description" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</Head>
+
+// About.js
+
+import { Head } from '@inertiajs/react'
+
+<Head>
+  <title>About - My app</title>
+  <meta head-key="description" name="description" content="This is a page specific description" />
+</Head>
 ```
