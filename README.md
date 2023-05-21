@@ -1,6 +1,25 @@
 # Laravel - React stack using Inertia.js
 ## Table of Contents
-[Installation](#installation)
+- [Installation](#installation)
+- [Pages](#pages)
+    - [Rendering a page](#rendering-a-page)
+    - [Passing through variables](#passing-through-variables)
+- [Links](#links---forget-about-anchor-tags)
+    - [Link components](#link-components)
+    - [Shared components](#shared-components)
+- [Layouts](#layouts)
+    - [Layout files](#layout-files)
+    - [Persistent layouts](#persistent-layouts)
+    - [Default layouts](#default-layouts)
+- [Progress bar](#progress-bar-on-loading-pages)
+- [Non-GET requests](#non-get-requests-through-links)
+    - [Data](#passing-through-data)
+- [Scroll preservation](#preventing-a-page-from-scrolling-up-when-a-link-is-clicked)
+- [Active links](#styling-active-links)
+- [Shared data](#shared-data-across-all-pages-and-components)
+- [Head & Title](#head--title)
+    - [Multiple Heads](#what-if-we-have-multiple-head-instances)
+
 ## Installation
 1. Create a Laravel project
 ```
